@@ -119,6 +119,7 @@ router.post("/login", async (req, res) => {
     }
   );
   // res.cookie("nToken", token, { maxAge: 900000, httpOnly: true });
+  // res.header("auth-token", token).send({ token: token, id: user._id });
   res.header("auth-token", token).send(token);
 });
 

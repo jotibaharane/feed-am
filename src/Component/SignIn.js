@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
+import ReCAPTCHA from "react-google-recaptcha";
 import GoogleLogin from "react-google-login";
 import Snackbar from "@mui/material/Snackbar";
 import {
@@ -32,13 +33,11 @@ function SignIn() {
     email: "",
     password: "",
   });
-  const [googleData, setGoogleData] = useState({
+  const googleData = {
     idToken: "",
     reCaptchaToken: "",
-  });
-
-  console.log("jotiba test")
-
+  };
+  const reRef = useRef();
   const signIn = async (e) => {
     e.preventDefault();
     await axios(`http://localhost:8000/users/login`, {
@@ -46,8 +45,10 @@ function SignIn() {
       data: signInForm,
     })
       .then((res) => {
+        console.log(res);
         setOpen(true);
         localStorage.setItem("token", JSON.stringify(res));
+        // localStorage.setItem("user", JSON.stringify(res));
         setTimeout(() => {
           navigate("/");
         }, 1000);
@@ -63,13 +64,21 @@ function SignIn() {
   };
 
   const responseGoogle = async (response) => {
-    setGoogleData({ idToken: response.tokenId, reCaptchaToken: "token" });
-    setGoogleData({
-      idToken: "",
-      reCaptchaToken: "",
-    });
+    const token = await reRef.current.executeAsync();
+    googleData.reCaptchaToken = token;
+    googleData.idToken = response.tokenId;
+    axios
+      .post("http://localhost:8000/users/auth/google", googleData, {
+        headers: { Accept: "application/json" },
+      })
+      .then((response) => {
+        localStorage.setItem("token", JSON.stringify(response));
+        navigate("/");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -78,8 +87,6 @@ function SignIn() {
     setOpen1(false);
     setOpen(false);
   };
-
-
 
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
@@ -189,8 +196,14 @@ function SignIn() {
                           password: value.target.value,
                         })
                       }
+                      autoComplete="none"
                     />
                   </Grid>
+                  <ReCAPTCHA
+                    sitekey="6Ld3COIZAAAAAC3A_RbO1waRz6QhrhdObYOk7b_5"
+                    size="invisible"
+                    ref={reRef}
+                  />
                   <Grid item sx={{ marginTop: "15px" }}>
                     <Button type="submit" variant="outlined" color="success">
                       Sign In
@@ -208,9 +221,10 @@ function SignIn() {
                       </FormLabel>
                     </FormControl>
                   </Grid>
+
                   <Grid item sx={{ textAlign: "center", marginTop: "15px" }}>
                     <GoogleLogin
-                      clientId="971623344603-0qquan9pcdb9iu7oq9genvpnel77i7oa.apps.googleusercontent.com"
+                      clientId="692565184932-h9dv74rig6sccdqctvg7npbp5q8rrlj6.apps.googleusercontent.com"
                       buttonText="Log in with google"
                       onSuccess={responseGoogle}
                       onFailure={responseGoogle}

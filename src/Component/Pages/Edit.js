@@ -10,6 +10,7 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import Nav from "./Nav";
 import {
   CardMedia,
+  Container,
   FormControlLabel,
   FormLabel,
   Input,
@@ -32,11 +33,27 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  minWidth: 700,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  marginTop: "30px",
+};
+
 const Edit = () => {
   const [open1, setOpen1] = React.useState(false);
   const [open2, setOpen2] = React.useState(false);
   const [picture, setPicture] = React.useState("user.png");
-  const token =JSON.parse(localStorage.getItem("token")) || "";
+  const token = JSON.parse(localStorage.getItem("token")) || "";
 
   const navigate = useNavigate();
   const [editForm, setEditForm] = useState({
@@ -57,14 +74,13 @@ const Edit = () => {
       },
     })
       .then((res) => {
-        console.log(res);
-        console.log(res.data);
         if (res.data !== "") {
           setEditForm({
             image:
               res.data.image ||
               "https://gogetfunding.com/wp-content/uploads/2020/06/6707938/img/mimg_6707938_1592357701.png",
-            username: res.data.firstname + " " + res.data.lastname || " ",
+            username:
+              res.data.username || res.data.firstname + " " + res.data.lastname,
             bio: res.data.bio || "",
             gender: res.data.gender || "",
             DOB: res.data.DOB || "",
@@ -111,6 +127,7 @@ const Edit = () => {
     })
       .then((res) => {
         setOpen1(true);
+        navigate("/");
       })
       .catch((err) => {
         setOpen2(true);
@@ -134,34 +151,25 @@ const Edit = () => {
   }
 
   return (
-    <div>
+    <Container>
       <Nav />
-      <Box
-        maxWidth="100%"
-        sx={{
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: "40px",
-        }}
-      >
-        <Paper elevation={1} sx={{ width: "70%", height: "90vh" }}>
-          <Grid container xs={12} sx={{ height: "90vh" }}>
+      <Box sx={style}>
+        <Paper elevation={1} sx={{ minWidth: 700 }}>
+          <Grid container>
             <Grid
               item
-              xs={6}
+              xs={5}
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
               }}
             >
-              <form onSubmit={signUp}>
+              <form onSubmit={signUp} style={{ padding: "10px" }}>
                 <Grid container direction="column">
                   <Grid item>
-                    <FormControl sx={{ width: "100%" }}>
-                      <FormLabel sx={{ float: "left" }}>
+                    <FormControl>
+                      <FormLabel>
                         <Typography
                           component="h1"
                           sx={{ fontSize: "25px", fontWeight: "bold" }}
@@ -171,13 +179,12 @@ const Edit = () => {
                       </FormLabel>
                     </FormControl>
                   </Grid>
-                  <Grid item sx={{ marginTop: "10px" }}>
+                  <Grid item>
                     <FormControl>
                       <FormLabel>Change Profile Picture</FormLabel>
                       <Input
                         type="file"
                         label="Upload Profile Picture"
-                        src
                         onChange={handleChange}
                       />
                     </FormControl>
@@ -224,6 +231,7 @@ const Edit = () => {
                         setEditForm({
                           ...editForm,
                           bio: value.target.value,
+                          
                         })
                       }
                     />
@@ -304,27 +312,31 @@ const Edit = () => {
                   <Grid item sx={{ marginTop: "10px" }}>
                     <MuiPhoneNumber
                       defaultCountry={"in"}
+                      type="tel"
                       name="mobile"
                       value={editForm.mobile}
-                      onChange={(value) =>
+                      onChange={(value) => 
                         setEditForm({
                           ...editForm,
                           mobile: value,
-                        })
-                      }
+                        })}
+                        
+                      //   if (value.length !== 14) {
+                      //   //  alert("good"); }
+                      // }}
                       InputLabelProps={{ style: { fontSize: 18 } }}
                     />
                   </Grid>
 
                   <Grid item sx={{ marginTop: "15px", display: "flex" }}>
-                    <Button type="submit" variant="outlined" color="success">
+                    <Button type="submit" disabled={editForm.mobile.length!==15} variant="outlined" color="success">
                       Update
                     </Button>
                     <Button
                       variant="outlined"
                       color="success"
                       sx={{ marginLeft: "10px" }}
-                      onClick={() => navigate("/feed")}
+                      onClick={() => navigate("/")}
                     >
                       Cancel
                     </Button>
@@ -334,20 +346,17 @@ const Edit = () => {
             </Grid>
             <Grid
               item
-              xs={6}
+              xs={7}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                border: "1px solid grey",
+                border: "2px solid #000",
+                minWidth: "500",
               }}
             >
               <CardMedia
                 component="img"
-                height="300"
-                width="100%"
+                height="508"
                 image={editForm.image}
-                alt="green iguana"
+                alt="profile picture"
                 sx={{ objectFit: "fill" }}
               />
             </Grid>
@@ -374,7 +383,7 @@ const Edit = () => {
           Invalid Data
         </Alert>
       </Snackbar>
-    </div>
+    </Container>
   );
 };
 

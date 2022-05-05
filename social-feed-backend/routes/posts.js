@@ -46,7 +46,7 @@ router.post("/add", verify, upload.single("image"), async (req, res) => {
 router.get("/", verify, async (req, res) => {
   console.log(req.user._id);
   try {
-    const posts = await Post.find();
+    const posts = await Post.find().sort({ createdAt: -1 });
     const updatedPost = posts.map((post) => {
       return { ...post._doc, image: imageURL + post.image };
     });
@@ -113,12 +113,23 @@ router.get("/params", verify, async (req, res) => {
   try {
     const { page, limit } = req.query;
     const posts = await Post.find()
+      .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
     const updatedPost = posts.map((post) => {
       return { ...post._doc, image: imageURL + post.image };
     });
-    res.send({ post: updatedPost, page: page, limit: limit });
+    updatedPost != ""
+      ? res.send({
+          post: updatedPost,
+          page: parseInt(page) + 1,
+          end: false,
+        })
+      : res.send({
+          post: updatedPost,
+          page: parseInt(page) + 1,
+          end: true,
+        });
   } catch (err) {
     res.json({ message: err });
   }

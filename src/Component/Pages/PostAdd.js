@@ -13,21 +13,18 @@ import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 
 const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
   width: 400,
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  marginTop: "50px",
 };
 
 function PostAdd({ setOpen1, fetchData, setOpen, open }) {
   const navigate = useNavigate();
   const token = JSON.parse(localStorage.getItem("token")) || "";
-  //   const [open, setOpen] = useState(false);
+
   const [addPost, setAddPost] = useState({
     caption: "",
     likes: [],
@@ -37,13 +34,6 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
     picturePreview: "task.jpeg",
   });
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-  };
   const post = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -73,7 +63,7 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
       picturePreview: "task.jpeg",
     });
   };
-
+  console.log(picture.pictureAsFile);
   function handleChange(e) {
     setPicture({
       picturePreview: URL.createObjectURL(e.target.files[0]),
@@ -82,57 +72,55 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <form onSubmit={post}>
-          <Paper
-            elevation={3}
-            sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-            }}
-          >
-            <Card sx={{ backgroundColor: "#f5f5f5" }}>
-              <CardContent>
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={picture.picturePreview}
-                  sx={{ objectFit: "fill" }}
-                  alt="post img"
-                />
-              </CardContent>
-              <CardContent>
-                <FormLabel>Photo *</FormLabel>
-                <Input
-                  type="file"
-                  label="Upload Profile Picture"
-                  onChange={handleChange}
-                />
-              </CardContent>
-              <CardContent>
-                <TextField
-                  type="text"
-                  placeholder="Add Caption *"
-                  variant="standard"
-                  sx={{ width: "95%" }}
-                  fullWidth
-                  value={addPost.caption}
-                  onChange={(e) =>
-                    setAddPost({ ...addPost, caption: e.target.value })
-                  }
-                />
-              </CardContent>
-              <CardContent sx={{ textAlign: "center" }}>
-                <Button type="submit" variant="outlined" color="success">
-                  Submit
-                </Button>
-              </CardContent>
-            </Card>
-          </Paper>
-        </form>
-      </Box>
-    </Modal>
+    <Box sx={style}>
+      <form onSubmit={post}>
+        <Paper
+          elevation={3}
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+          }}
+        >
+          <Card sx={{ backgroundColor: "#f5f5f5" }}>
+            <CardContent>
+              <CardMedia
+                component="img"
+                height="180"
+                image={picture.picturePreview}
+                sx={{ objectFit: "fill" }}
+                alt="post img"
+              />
+            </CardContent>
+            <CardContent>
+              <FormLabel>Photo *</FormLabel>
+              <Input
+                type="file"
+                label="Upload Profile Picture"
+                onChange={handleChange}
+              />
+            </CardContent>
+            <CardContent>
+              <TextField
+                type="text"
+                placeholder="Add Caption *"
+                variant="standard"
+                sx={{ width: "95%" }}
+                fullWidth
+                value={addPost.caption}
+                onChange={(e) =>
+                  setAddPost({ ...addPost, caption: e.target.value })
+                }
+              />
+            </CardContent>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Button type="submit" variant="outlined" color="success">
+                Submit
+              </Button>
+            </CardContent>
+          </Card>
+        </Paper>
+      </form>
+    </Box>
   );
 }
 

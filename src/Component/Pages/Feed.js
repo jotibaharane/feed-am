@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Modal from "@mui/material/Modal";
 import Nav from "./Nav";
 import Snackbar from "@mui/material/Snackbar";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,16 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import PostAdd from "./PostAdd";
 import Skeletons from "./Skeletons";
+import InfiniteScroll from "react-infinite-scroll-component";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 function Feed() {
   const navigate = useNavigate();
 
@@ -17,8 +26,11 @@ function Feed() {
   const [data, setData] = useState([]);
   const [open1, setOpen1] = useState({ open: false, severity: "success" });
   const [open, setOpen] = useState(false);
+  const [limit, setLimit] = useState(2);
+  const [page, setPage] = useState(1);
+  const [end, setEnd] = useState(false);
   useEffect(() => {
-    fetchData();
+    fetchData(3);
   }, []);
 
   const handleClose = (event, reason) => {
@@ -30,44 +42,107 @@ function Feed() {
   };
 
   const fetchData = () => {
-    axios(`http://localhost:8000/posts`, {
+    axios(`http://localhost:8000/posts/params?page=${page}&limit=${limit}`, {
       method: "GET",
       headers: {
         "auth-token": token.data,
       },
     }).then((res) => {
-      res.data !== "Invalid Token" ? setData(res.data) : navigate("/login");
+      console.log(res.data.page);
+      res.data !== "Invalid Token"
+        ? setData(res.data.post)
+        : navigate("/login");
+      setPage(res.data.page);
     });
   };
 
+  const loadFunc = () => {
+    console.log(page);
+    setTimeout(() => {
+      axios
+        .get(`http://localhost:8000/posts/params?page=${page}&limit=${limit}`, {
+          headers: {
+            "auth-token": token.data,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          setPage(response.data.page);
+          setEnd(response.data.end);
+          const arr = [...data];
+          response.data.post?.map((i) => {
+            arr.push(i);
+          });
+          setData(arr);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 1000);
+  };
   return (
-    <Container maxWidth="100%" sx={{ backgroundColor: "#fff9c4" }}>
-      <Nav setOpen={setOpen} />
-      <Modal open={open} onClose={handleClose}>
-        <PostAdd
-          setOpen1={setOpen1}
-          fetchData={fetchData}
-          setOpen={setOpen}
-          open={open}
-        />
-      </Modal>
-      <Grid
-        minHeight="100vh"
-        sx={{ flexGrow: 1, marginTop: "60px" }}
-        container
-        spacing={2}
-      >
-        <Grid item xs={12}>
-          <Grid container spacing={1} sx={{ marginLeft: "22%" }}>
-            {data.map((value) => (
-              <Grid key={value._id} item>
-                <Skeletons />
-                <CardCon id={value._id} data={value} />
-              </Grid>
+    <Table stickyHeader aria-label="sticky table">
+      <TableHead>
+        <TableRow>
+          <TableCell>
+            <Nav setOpen={setOpen} open={open} />
+            <Button
+              type="submit"
+              onClick={() => setOpen(true)}
+              variant="outlined"
+              style={{ marginRight: "10px" }}
+            >
+              create post
+            </Button>
+          </TableCell>
+        </TableRow>
+      </TableHead>
+
+      {open && (
+        <TableBody sx={{ display: "flex", justifyContent: "center" }}>
+          <TableRow>
+            <TableCell>
+              <PostAdd
+                setOpen1={setOpen1}
+                fetchData={fetchData}
+                setOpen={setOpen}
+                open={open}
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      )}
+      <TableBody sx={{ display: "flex", justifyContent: "center" }}>
+        <InfiniteScroll
+          dataLength={data.length}
+          next={loadFunc}
+          hasMore={true}
+          loader={
+            <div className="loader" key={0}>
+              {end == true ? (
+                "End of the post"
+              ) : (
+                <>
+                  <TableRow>
+                    <TableCell>
+                      <Skeletons />
+                    </TableCell>
+                  </TableRow>
+                </>
+              )}
+            </div>
+          }
+        >
+          {data &&
+            data.map((value) => (
+              <TableRow key={value._id}>
+                <TableCell>
+                  <CardCon id={value._id} data={value} />
+                </TableCell>
+              </TableRow>
             ))}
-          </Grid>
-        </Grid>
-      </Grid>
+        </InfiniteScroll>
+      </TableBody>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open1.open}
@@ -82,7 +157,7 @@ function Feed() {
           Post added Succesfully!
         </Alert>
       </Snackbar>
-    </Container>
+    </Table>
   );
 }
 export default Feed;

@@ -5,7 +5,7 @@ import SignIn from "./Component/SignIn";
 import Feed from "./Component/Pages/Feed";
 import Edit from "./Component/Pages/Edit";
 import PasswordChange from "./Component/Pages/PasswordChange";
-import Skeletons from "./Component/Pages/Skeletons";
+
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 function App() {

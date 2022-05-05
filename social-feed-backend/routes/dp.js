@@ -23,7 +23,16 @@ var upload = multer({ storage: storage });
 router.put("/update", verify, upload.single("image"), async (req, res) => {
   const { error } = updateUserValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-
+  const users = await User.find();
+  // console.log(users);
+  const filteredUsers = users.filter((user) => req.user._id != user._id);
+  console.log(filteredUsers);
+  const emailExists = filteredUsers.filter(
+    (user) => user.email == req.body.email
+  );
+  console.log(emailExists);
+  if (emailExists.length > 0)
+    return res.status(400).send("Email already exists!");
   console.log(req.user._id);
   try {
     const updatedUser = await User.updateOne(
@@ -45,6 +54,5 @@ router.put("/update", verify, upload.single("image"), async (req, res) => {
     res.json(err);
   }
 });
-
 
 module.exports = router;

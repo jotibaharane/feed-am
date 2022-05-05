@@ -57,35 +57,18 @@ function stringAvatar(name) {
 function CardCon({ data }) {
   const token = JSON.parse(localStorage.getItem("token")) || "";
   const [allComment, setAllComment] = useState([]);
-  const [allLike, setAllLike] = useState([]);
-  const [allComLike, setAllComLike] = useState([]);
   const [comment, setComment] = useState({ text: "" });
-  const [colorlike, setcolorlike] = useState(false);
-  const [colorlike1, setcolorlike1] = useState(false);
+  const [colorlike, setcolorlike] = useState(true);
+  const [colorlike1, setcolorlike1] = useState(true);
   const [expanded, setExpanded] = useState(false);
-
-  const like = async (postId) => {
-    await axios(`http://localhost:8000/posts/${postId}`, {
-      method: "PUT",
-      headers: {
-        "auth-token": token.data,
-      },
-    }).then((res) => setAllLike(res.data.likes));
-  };
-
-
-console.log(allComment);
-
-  const like1 = async (commentId) => {
-    await axios(`http://localhost:8000/posts/comments/${commentId}`, {
-      method: "PUT",
-      headers: {
-        "auth-token": token.data,
-      },
-    }).then((res) => {
-      console.log(res.data.likes);
-      setAllComLike(res.data.likes)});
-  };
+  const [noOfLikes, setNoOfLikes] = React.useState({
+    id: "",
+    no: 0,
+  });
+  const [noOfLikes1, setNoOfLikes1] = React.useState({
+    id: "",
+    no: 0,
+  });
 
   const getComm = async (postId) => {
     await axios(`http://localhost:8000/posts/comments/${postId}`, {
@@ -120,10 +103,49 @@ console.log(allComment);
 
   useEffect(() => {
     getComm(data._id);
-    like(data._id);
   }, []);
 
-  console.log(data);
+  const handleLikes = (postId) => {
+    setcolorlike(!colorlike);
+    axios
+      .put(
+        `http://localhost:8000/posts/${postId}`,
+        {},
+        {
+          headers: {
+            "auth-token": token.data,
+          },
+        }
+      )
+      .then((res) => {
+        setNoOfLikes({ id: postId, no: res.data.likes.length });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleLikes1 = (postId) => {
+    setcolorlike1(!colorlike1);
+
+    axios
+      .put(
+        `http://localhost:8000/posts/comments/${postId}`,
+        {},
+        {
+          headers: {
+            "auth-token": token.data,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        setNoOfLikes1({ id: postId, no: res.data.likes.length });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   if (data) {
     return (
@@ -154,13 +176,16 @@ console.log(allComment);
 
             <Typography gutterBottom variant="p" component="p">
               <ThumbUpTwoToneIcon
-                onClick={(e) => {
-                  setcolorlike(!colorlike);
-                  like(data._id);
-                }}
+                // onClick={(e) => setcolorlike(!colorlike)}
+                onClick={() => handleLikes(data._id)}
                 style={{ color: colorlike ? "red" : "grey" }}
               />
-              {allLike.length} Likes
+              {noOfLikes.no === 0
+                ? data.likes.length
+                : noOfLikes.id == data._id
+                ? noOfLikes.no
+                : data.likes.length}{" "}
+              Likes
               <ChatBubbleTwoToneIcon
                 sx={{ marginLeft: "10px" }}
                 onClick={() => handleExpandClick(data._id)}
@@ -194,12 +219,13 @@ console.log(allComment);
                 bgcolor: "background.paper",
                 position: "relative",
                 overflow: "auto",
-                maxHeight: 200,
+                maxHeight: 100,
               }}
             >
               {allComment.map((com) => {
+                console.log(com);
                 return (
-                  <CardContent>
+                  <CardContent key={com._id}>
                     <Divider variant="inset" component="li" />
                     <ListItem alignItems="flex-start" key={com._id}>
                       <ListItemAvatar>
@@ -233,13 +259,15 @@ console.log(allComment);
                       sx={{ justifyContent: "right", marginRight: "10%" }}
                     >
                       <FavoriteBorderOutlinedIcon
+                        onClick={() => handleLikes1(com._id)}
                         style={{ color: colorlike1 ? "red" : "grey" }}
-                        onClick={(e) => {
-                          setcolorlike1(!colorlike1);
-                          like1(com._id);
-                        }}
                       />
-                      {allComLike.length} Likes
+                      {noOfLikes1.no === 0
+                        ? com.likes.length
+                        : noOfLikes1.id == com._id
+                        ? noOfLikes1.no
+                        : com.likes.length}{" "}
+                      Likes
                     </ListItem>
                     <Divider variant="inset" component="li" />
                   </CardContent>

@@ -38,6 +38,7 @@ const updateUserValidation = (data) => {
     gender: Joi.string().required(),
     DOB: Joi.string(),
     mobile: Joi.string(),
+    image: Joi.string(),
   });
   return schema.validate(data);
 };
