@@ -57,7 +57,7 @@ function PasswordChange() {
         method: "PUT",
         data: password,
         headers: {
-          "auth-token": token.data,
+          "auth-token": token.token,
         },
       })
         .then((res) => {

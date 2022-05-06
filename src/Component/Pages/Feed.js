@@ -45,7 +45,7 @@ function Feed() {
     axios(`http://localhost:8000/posts/params?page=${page}&limit=${limit}`, {
       method: "GET",
       headers: {
-        "auth-token": token.data,
+        "auth-token": token.token,
       },
     }).then((res) => {
       console.log(res.data.page);
@@ -62,7 +62,7 @@ function Feed() {
       axios
         .get(`http://localhost:8000/posts/params?page=${page}&limit=${limit}`, {
           headers: {
-            "auth-token": token.data,
+            "auth-token": token.token,
           },
         })
         .then((response) => {

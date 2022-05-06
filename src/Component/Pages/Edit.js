@@ -7,12 +7,14 @@ import MuiPhoneNumber from "material-ui-phone-number";
 import DateFnsUtils from "@date-io/date-fns";
 import WbIncandescentIcon from "@mui/icons-material/WbIncandescent";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import Nav from "./Nav";
 import {
   CardMedia,
   Container,
   FormControlLabel,
   FormLabel,
+  IconButton,
   Input,
   InputAdornment,
   Radio,
@@ -70,15 +72,13 @@ const Edit = () => {
     await axios(`http://localhost:8000/users/getuser`, {
       method: "GET",
       headers: {
-        "auth-token": token.data,
+        "auth-token": token.token,
       },
     })
       .then((res) => {
         if (res.data !== "") {
           setEditForm({
-            image:
-              res.data.image ||
-              "https://gogetfunding.com/wp-content/uploads/2020/06/6707938/img/mimg_6707938_1592357701.png",
+            image: res.data.image || "user.png",
             username:
               res.data.username || res.data.firstname + " " + res.data.lastname,
             bio: res.data.bio || "",
@@ -122,7 +122,7 @@ const Edit = () => {
       method: "PUT",
       data: formData,
       headers: {
-        "auth-token": token.data,
+        "auth-token": token.token,
       },
     })
       .then((res) => {
@@ -231,7 +231,6 @@ const Edit = () => {
                         setEditForm({
                           ...editForm,
                           bio: value.target.value,
-                          
                         })
                       }
                     />
@@ -315,12 +314,12 @@ const Edit = () => {
                       type="tel"
                       name="mobile"
                       value={editForm.mobile}
-                      onChange={(value) => 
+                      onChange={(value) =>
                         setEditForm({
                           ...editForm,
                           mobile: value,
-                        })}
-                        
+                        })
+                      }
                       //   if (value.length !== 14) {
                       //   //  alert("good"); }
                       // }}
@@ -329,7 +328,12 @@ const Edit = () => {
                   </Grid>
 
                   <Grid item sx={{ marginTop: "15px", display: "flex" }}>
-                    <Button type="submit" disabled={editForm.mobile.length!==15} variant="outlined" color="success">
+                    <Button
+                      type="submit"
+                      disabled={editForm.mobile.length !== 15}
+                      variant="outlined"
+                      color="success"
+                    >
                       Update
                     </Button>
                     <Button
@@ -350,8 +354,19 @@ const Edit = () => {
               sx={{
                 border: "2px solid #000",
                 minWidth: "500",
+                position: "relative",
               }}
             >
+              <IconButton
+                color="secondary"
+                sx={{ position: "absolute", right: "0px" }}
+              >
+                <CloseOutlinedIcon
+                  onClick={() =>
+                    setEditForm({ ...editForm, image: "user.png" })
+                  }
+                />
+              </IconButton>
               <CardMedia
                 component="img"
                 height="508"

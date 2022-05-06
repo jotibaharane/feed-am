@@ -74,7 +74,7 @@ function CardCon({ data }) {
     await axios(`http://localhost:8000/posts/comments/${postId}`, {
       method: "GET",
       headers: {
-        "auth-token": token.data,
+        "auth-token": token.token,
       },
     }).then((res) => {
       setAllComment(res.data);
@@ -87,7 +87,7 @@ function CardCon({ data }) {
         method: "POST",
         data: comment,
         headers: {
-          "auth-token": token.data,
+          "auth-token": token.token,
         },
       }).then((res) => {
         getComm(postId);
@@ -113,7 +113,7 @@ function CardCon({ data }) {
         {},
         {
           headers: {
-            "auth-token": token.data,
+            "auth-token": token.token,
           },
         }
       )
@@ -134,7 +134,7 @@ function CardCon({ data }) {
         {},
         {
           headers: {
-            "auth-token": token.data,
+            "auth-token": token.token,
           },
         }
       )

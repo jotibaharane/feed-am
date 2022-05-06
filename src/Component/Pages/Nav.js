@@ -66,7 +66,7 @@ const Nav = ({ setOpen, open }) => {
     axios(`http://localhost:8000/users/getuser`, {
       method: "GET",
       headers: {
-        "auth-token": token.data,
+        "auth-token": token.token,
       },
     }).then((res) => {
       setName(res.data);

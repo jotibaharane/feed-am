@@ -47,7 +47,7 @@ function SignIn() {
       .then((res) => {
         console.log(res);
         setOpen(true);
-        localStorage.setItem("token", JSON.stringify(res));
+        localStorage.setItem("token", JSON.stringify(res.data));
         // localStorage.setItem("user", JSON.stringify(res));
         setTimeout(() => {
           navigate("/");

@@ -37,33 +37,40 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
   const post = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-
-    formData.append("image", picture.pictureAsFile);
-    formData.append("caption", addPost.caption);
-    await axios(`http://localhost:8000/posts/add`, {
-      method: "POST",
-      data: formData,
-      headers: {
-        "auth-token": token.data,
-      },
-    })
-      .then((res) => {
-        fetchData();
-        setOpen1({ open: true, severity: "success" });
-        setOpen(false);
-        navigate("/");
+    if (!picture.pictureAsFile) {
+      console.log("image is required");
+      return false;
+    } else if (!picture.pictureAsFile.name.match(/\.(jpg|jpeg|png|gif)$/)) {
+      console.log("select valid image.");
+      return false;
+    } else {
+      formData.append("image", picture.pictureAsFile);
+      formData.append("caption", addPost.caption);
+      await axios(`http://localhost:8000/posts/add`, {
+        method: "POST",
+        data: formData,
+        headers: {
+          "auth-token": token.token,
+        },
       })
-      .catch((err) => {
-        setOpen1({ open: true, severity: "error" });
-      });
+        .then((res) => {
+          fetchData();
+          setOpen1({ open: true, severity: "success" });
+          setOpen(false);
+          navigate("/");
+        })
+        .catch((err) => {
+          setOpen1({ open: true, severity: "error" });
+        });
 
-    formData.delete("image");
-    formData.delete("caption");
-    setPicture({
-      picturePreview: "task.jpeg",
-    });
+      formData.delete("image");
+      formData.delete("caption");
+      setPicture({
+        picturePreview: "task.jpeg",
+      });
+    }
   };
-  console.log(picture.pictureAsFile);
+
   function handleChange(e) {
     setPicture({
       picturePreview: URL.createObjectURL(e.target.files[0]),
@@ -94,6 +101,7 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
             <CardContent>
               <FormLabel>Photo *</FormLabel>
               <Input
+                required
                 type="file"
                 label="Upload Profile Picture"
                 onChange={handleChange}
@@ -101,6 +109,7 @@ function PostAdd({ setOpen1, fetchData, setOpen, open }) {
             </CardContent>
             <CardContent>
               <TextField
+                required
                 type="text"
                 placeholder="Add Caption *"
                 variant="standard"
