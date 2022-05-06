@@ -23,6 +23,7 @@ var upload = multer({ storage: storage });
 router.put("/update", verify, upload.single("image"), async (req, res) => {
   const { error } = updateUserValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+
   const users = await User.find();
   // console.log(users);
   const filteredUsers = users.filter((user) => req.user._id != user._id);
@@ -33,6 +34,7 @@ router.put("/update", verify, upload.single("image"), async (req, res) => {
   console.log(emailExists);
   if (emailExists.length > 0)
     return res.status(400).send("Email already exists!");
+
   console.log(req.user._id);
   try {
     const updatedUser = await User.updateOne(
@@ -55,4 +57,16 @@ router.put("/update", verify, upload.single("image"), async (req, res) => {
   }
 });
 
+//Remove Profile Pic
+router.put("/remove", verify, async (req, res) => {
+  try {
+    const updatedpass = await User.updateOne(
+      { _id: req.user._id },
+      { $set: { image: "" } }
+    );
+    res.status(200).send("Profile Removed successfully");
+  } catch (err) {
+    res.json(err);
+  }
+});
 module.exports = router;

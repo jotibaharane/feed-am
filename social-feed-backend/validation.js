@@ -37,7 +37,9 @@ const updateUserValidation = (data) => {
     bio: Joi.string(),
     gender: Joi.string().required(),
     DOB: Joi.string(),
-    mobile: Joi.string(),
+    mobile: Joi.string()
+      .length(10)
+      .pattern(/^[0-9]+$/),
     image: Joi.string(),
   });
   return schema.validate(data);
@@ -53,8 +55,16 @@ const updatePassValidation = (data) => {
   });
   return schema.validate(data);
 };
+const addpostValidation = (data) => {
+  const schema = Joi.object({
+    image: Joi.string(),
+    caption: Joi.string().required(),
+  });
+  return schema.validate(data);
+};
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.updateUserValidation = updateUserValidation;
 module.exports.updatePassValidation = updatePassValidation;
+module.exports.addpostValidation = addpostValidation;

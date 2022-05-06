@@ -119,8 +119,7 @@ router.post("/login", async (req, res) => {
     }
   );
   // res.cookie("nToken", token, { maxAge: 900000, httpOnly: true });
-  // res.header("auth-token", token).send({ token: token, id: user._id });
-  res.header("auth-token", token).send(token);
+  res.header("auth-token", token).send({ token: token, id: user._id });
 });
 
 //change password
@@ -194,6 +193,8 @@ router.post("/auth/google", async (req, res) => {
     return res.status(400).send({ message: "something went wrong" });
   }
 });
+
+
 
 // router.put("/reset", async (req, res) => {
 //   res.send("resrt");

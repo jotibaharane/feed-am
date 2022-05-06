@@ -7,6 +7,7 @@ const PostSchema = mongoose.Schema(
     },
     caption: {
       type: String,
+      required: true,
     },
     createdBy: {
       type: String,

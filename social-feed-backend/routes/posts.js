@@ -2,7 +2,7 @@ const { json } = require("body-parser");
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/posts");
-// const Comment = require("../models/comment");
+const { addpostValidation } = require("../validation");
 const verify = require("./verifyToken");
 const multer = require("multer");
 const path = require("path");
@@ -25,6 +25,12 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 router.post("/add", verify, upload.single("image"), async (req, res) => {
+  console.log(req.body);
+  const { error } = addpostValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  if (!FileName) return res.status(400).send("image is required");
+  // res.send(FileName);
+  FileName = "";
   const post = new Post({
     image: FileName,
     caption: req.body.caption,
@@ -35,6 +41,7 @@ router.post("/add", verify, upload.single("image"), async (req, res) => {
   try {
     const savedPost = await post.save();
     console.log(savedPost);
+    FileName = "";
     res.json({ savedPost });
   } catch (err) {
     res.json({ message: err });
